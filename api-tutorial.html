@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat API Tutorial - Learn APIs the Fun Way! 🐱</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B9D;
+            --secondary: #FEC84B;
+            --accent: #4ECDC4;
+            --dark: #2D3142;
+            --light: #FFF8F0;
+            --code-bg: #2D3142;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Playful background decorations */
+        body::before {
+            content: '🐱';
+            position: fixed;
+            font-size: 150px;
+            opacity: 0.1;
+            top: -30px;
+            right: -30px;
+            animation: float 6s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '😻';
+            position: fixed;
+            font-size: 100px;
+            opacity: 0.1;
+            bottom: -20px;
+            left: -20px;
+            animation: float 8s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--light);
+            text-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            font-weight: 400;
+        }
+
+        .lesson {
+            background: var(--light);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .lesson:nth-child(1) { animation-delay: 0.2s; }
+        .lesson:nth-child(2) { animation-delay: 0.4s; }
+        .lesson:nth-child(3) { animation-delay: 0.6s; }
+        .lesson:nth-child(4) { animation-delay: 0.8s; }
+        .lesson:nth-child(5) { animation-delay: 1s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .lesson-number {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            line-height: 50px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: #555;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            color: #a9dc76;
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '< code >';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            color: var(--accent);
+        }
+
+        .keyword { color: #fc9867; }
+        .string { color: #ffd866; }
+        .comment { color: #727072; font-style: italic; }
+
+        .interactive-section {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(255, 107, 157, 0.1));
+            padding: 2rem;
+            border-radius: 20px;
+            margin: 1.5rem 0;
+            border: 3px dashed var(--accent);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 1rem 1.5rem;
+            border: 3px solid var(--accent);
+            border-radius: 15px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px rgba(255, 107, 157, 0.2);
+            transform: scale(1.02);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), #FF8FAB);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 15px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 157, 0.6);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-height: 100px;
+            position: relative;
+        }
+
+        .cat-display {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .cat-display img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .cat-display img:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .endpoint-display {
+            background: #f0f0f0;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin: 1rem 0;
+            border-left: 4px solid var(--accent);
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 0.3rem;
+            font-weight: 600;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(254, 200, 75, 0.3), rgba(255, 107, 157, 0.3));
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--light);
+            border-radius: 25px;
+            padding: 2.5rem;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: #FF8FAB;
+        }
+
+        .modal-close::before {
+            display: none;
+        }
+
+        .modal-cat-display {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .modal-cat-display img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+        }
+
+        .modal-info h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .lesson {
+                padding: 1.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            select {
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+                max-width: 95%;
+            }
+
+            .modal-close {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        .pro-tip {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .pro-tip::before {
+            content: '💡 Pro Tip: ';
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐱 Cat API Tutorial</h1>
+            <p class="subtitle">Learn how APIs work by playing with cats!</p>
+        </header>
+
+        <!-- Lesson 1: What is an API? -->
+        <div class="lesson">
+            <div class="lesson-number">1</div>
+            <h2>What is an API? 🤔</h2>
+            <p>
+                An <span class="highlight">API (Application Programming Interface)</span> is like a waiter at a restaurant. 
+                You (the customer) tell the waiter what you want, the waiter goes to the kitchen (the server), 
+                and brings back your food (the data)!
+            </p>
+            <p>
+                Today we're using the <strong>Cat as a Service API</strong> at <code>https://cataas.com</code>. 
+                It's a fun API that gives us random cat pictures! 🎉
+            </p>
+        </div>
+
+        <!-- Lesson 2: Your First API Call -->
+        <div class="lesson">
+            <div class="lesson-number">2</div>
+            <h2>Your First API Call 🚀</h2>
+            <p>
+                The simplest way to call an API is through a <span class="highlight">URL</span> (web address). 
+                Let's get a random cat picture!
+            </p>
+            
+            <div class="code-block">
+<span class="comment">// The basic endpoint for a random cat</span>
+<span class="keyword">GET</span> https://cataas.com/cat
+            </div>
+
+            <div class="interactive-section">
+                <h3>Try it yourself! 👇</h3>
+                <button onclick="getBasicCat()">Get Random Cat</button>
+                <div id="basic-result" class="result-box"></div>
+            </div>
+
+            <div class="pro-tip">
+                In web development, when we "call" an API, we're making an HTTP request. The most common type is a GET request, which asks for data.
+            </div>
+        </div>
+
+        <!-- Lesson 3: Adding Parameters -->
+        <div class="lesson">
+            <div class="lesson-number">3</div>
+            <h2>Adding Parameters 🎨</h2>
+            <p>
+                APIs often let you customize your request using <span class="highlight">parameters</span>. 
+                Parameters are like toppings on a pizza - they modify what you get back!
+            </p>
+            
+            <div class="code-block">
+<span class="comment">// Add text to your cat image</span>
+<span class="keyword">GET</span> https://cataas.com/cat/says/<span class="string">Hello</span>
+
+<span class="comment">// Customize the size</span>
+<span class="keyword">GET</span> https://cataas.com/cat?<span class="string">width=500&height=300</span>
+            </div>
+
+            <div class="interactive-section">
+                <h3>Customize your cat! 🎭</h3>
+                <div class="controls">
+                    <input type="text" id="catText" placeholder="Add text to cat" value="Hello!">
+                    <input type="number" id="catWidth" placeholder="Width" value="400" min="100" max="800">
+                    <input type="number" id="catHeight" placeholder="Height" value="300" min="100" max="600">
+                </div>
+                <button onclick="getCustomCat()">Generate Custom Cat</button>
+                <div class="endpoint-display" id="customEndpoint"></div>
+                <div id="custom-result" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Lesson 4: Query Tags -->
+        <div class="lesson">
+            <div class="lesson-number">4</div>
+            <h2>Using Tags 🏷️</h2>
+            <p>
+                The Cat API lets you filter cats by <span class="highlight">tags</span>. Want only cute cats? 
+                Or maybe grumpy ones? Tags help you find exactly what you need!
+            </p>
+            
+            <div class="code-block">
+<span class="comment">// Get a cat with a specific tag</span>
+<span class="keyword">GET</span> https://cataas.com/cat/<span class="string">cute</span>
+
+<span class="comment">// Combine tags with text</span>
+<span class="keyword">GET</span> https://cataas.com/cat/<span class="string">funny</span>/says/<span class="string">LOL</span>
+            </div>
+
+            <p>Popular tags include:</p>
+            <div>
+                <span class="tag">cute</span>
+                <span class="tag">funny</span>
+                <span class="tag">grumpy</span>
+                <span class="tag">sleeping</span>
+                <span class="tag">playing</span>
+            </div>
+
+            <div class="interactive-section">
+                <h3>Find your perfect cat! 😸</h3>
+                <div class="controls">
+                    <select id="catTag">
+                        <option value="">Random (no tag)</option>
+                        <option value="cute">Cute</option>
+                        <option value="funny">Funny</option>
+                        <option value="grumpy">Grumpy</option>
+                        <option value="sleeping">Sleeping</option>
+                        <option value="playing">Playing</option>
+                    </select>
+                    <input type="text" id="tagText" placeholder="Optional text" value="">
+                </div>
+                <button onclick="getTaggedCat()">Find Tagged Cat</button>
+                <div class="endpoint-display" id="tagEndpoint"></div>
+                <div id="tag-result" class="result-box"></div>
+            </div>
+        </div>
+
+        <!-- Lesson 5: Understanding API Responses -->
+        <div class="lesson">
+            <div class="lesson-number">5</div>
+            <h2>Real Code Example 💻</h2>
+            <p>
+                Here's how you'd use this API in real JavaScript code. This is the actual code 
+                powering the buttons above!
+            </p>
+            
+            <div class="code-block">
+<span class="comment">// Using fetch() to call the API</span>
+<span class="keyword">async function</span> getCatImage() {
+    <span class="keyword">const</span> url = <span class="string">'https://cataas.com/cat'</span>;
+    
+    <span class="comment">// Make the API request</span>
+    <span class="keyword">const</span> response = <span class="keyword">await</span> fetch(url);
+    
+    <span class="comment">// The image URL is ready to use!</span>
+    <span class="keyword">const</span> imageUrl = response.url;
+    
+    <span class="comment">// Display the image</span>
+    document.querySelector(<span class="string">'img'</span>).src = imageUrl;
+}
+            </div>
+
+            <div class="interactive-section">
+                <h3>Complete Example 🎯</h3>
+                <p>Build your ultimate cat image with all the features!</p>
+                <div class="controls">
+                    <select id="finalTag">
+                        <option value="">No tag</option>
+                        <option value="cute">Cute</option>
+                        <option value="funny">Funny</option>
+                        <option value="grumpy">Grumpy</option>
+                    </select>
+                    <input type="text" id="finalText" placeholder="Text on cat" value="I learned APIs!">
+                    <input type="number" id="finalSize" placeholder="Size" value="500" min="200" max="800">
+                    <select id="finalFilter">
+                        <option value="">No filter</option>
+                        <option value="blur">Blur</option>
+                        <option value="mono">Black & White</option>
+                        <option value="sepia">Sepia</option>
+                    </select>
+                </div>
+                <button onclick="getFinalCat()">Create Ultimate Cat!</button>
+                <div class="endpoint-display" id="finalEndpoint"></div>
+                <div id="final-result" class="result-box"></div>
+            </div>
+
+            <div class="pro-tip">
+                APIs are everywhere! Weather apps, social media, maps - they all use APIs to exchange data between different applications. Now you know how they work! 🎓
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Custom Cat -->
+    <div id="customCatModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Lesson 2: Basic cat
+        function getBasicCat() {
+            const resultDiv = document.getElementById('basic-result');
+            resultDiv.innerHTML = '<div class="loading">Fetching a cat</div>';
+            
+            const url = 'https://cataas.com/cat?' + Date.now(); // Add timestamp to prevent caching
+            
+            resultDiv.innerHTML = `
+                <div class="cat-display">
+                    <img src="${url}" alt="Random cat" onload="this.style.opacity=1" style="opacity:0; transition: opacity 0.5s;">
+                </div>
+                <p><strong>API Endpoint:</strong> <code>https://cataas.com/cat</code></p>
+            `;
+        }
+
+        // Modal control functions
+        function openModal() {
+            const modal = document.getElementById('customCatModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customCatModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside the content
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('customCatModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Lesson 3: Custom cat with parameters - NOW SHOWS IN MODAL
+        function getCustomCat() {
+            const text = document.getElementById('catText').value;
+            const width = document.getElementById('catWidth').value;
+            const height = document.getElementById('catHeight').value;
+            const modalContent = document.getElementById('modalContent');
+            const endpointDiv = document.getElementById('customEndpoint');
+            
+            // Show loading in the in-page result first
+            const resultDiv = document.getElementById('custom-result');
+            resultDiv.innerHTML = '<div class="loading">Creating your custom cat</div>';
+            
+            let url = 'https://cataas.com/cat';
+            
+            if (text) {
+                url += `/says/${encodeURIComponent(text)}`;
+            }
+            
+            url += `?width=${width}&height=${height}&${Date.now()}`;
+            
+            endpointDiv.textContent = url.replace(/&\d+$/, ''); // Show URL without timestamp
+            
+            // Populate modal content
+            modalContent.innerHTML = `
+                <h2 style="color: var(--primary); margin-bottom: 1.5rem; font-size: 2rem;">🎨 Your Custom Cat!</h2>
+                <div class="modal-cat-display">
+                    <img src="${url}" alt="Custom cat" onload="this.style.opacity=1; openModal();" style="opacity:0; transition: opacity 0.5s;">
+                </div>
+                <div class="modal-info">
+                    <h3>✨ Configuration</h3>
+                    <p style="margin-bottom: 0.5rem;"><strong>Text:</strong> ${text || 'None'}</p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Dimensions:</strong> ${width}px × ${height}px</p>
+                    <p style="margin-bottom: 1rem;"><strong>Endpoint:</strong></p>
+                    <div class="endpoint-display">${url.replace(/&\d+$/, '')}</div>
+                    <p style="margin-top: 1rem; color: #666;">
+                        💡 Click anywhere outside this box or press ESC to close
+                    </p>
+                </div>
+            `;
+            
+            // Clear the in-page result once modal is ready
+            resultDiv.innerHTML = '<p style="text-align: center; color: var(--accent); font-size: 1.1rem;">✨ Check the modal above!</p>';
+        }
+
+        // Lesson 4: Tagged cat
+        function getTaggedCat() {
+            const tag = document.getElementById('catTag').value;
+            const text = document.getElementById('tagText').value;
+            const resultDiv = document.getElementById('tag-result');
+            const endpointDiv = document.getElementById('tagEndpoint');
+            
+            resultDiv.innerHTML = '<div class="loading">Finding your tagged cat</div>';
+            
+            let url = 'https://cataas.com/cat';
+            
+            if (tag) {
+                url += `/${tag}`;
+            }
+            
+            if (text) {
+                url += `/says/${encodeURIComponent(text)}`;
+            }
+            
+            url += `?${Date.now()}`;
+            
+            endpointDiv.textContent = url.replace(/\?\d+$/, ''); // Show URL without timestamp
+            
+            resultDiv.innerHTML = `
+                <div class="cat-display">
+                    <img src="${url}" alt="Tagged cat" onload="this.style.opacity=1" style="opacity:0; transition: opacity 0.5s;">
+                </div>
+                <p><strong>🏷️ Applied filters:</strong> ${tag ? `Tag: ${tag}` : 'Random'}${text ? `, Text: "${text}"` : ''}</p>
+            `;
+        }
+
+        // Lesson 5: Ultimate cat with all features
+        function getFinalCat() {
+            const tag = document.getElementById('finalTag').value;
+            const text = document.getElementById('finalText').value;
+            const size = document.getElementById('finalSize').value;
+            const filter = document.getElementById('finalFilter').value;
+            const resultDiv = document.getElementById('final-result');
+            const endpointDiv = document.getElementById('finalEndpoint');
+            
+            resultDiv.innerHTML = '<div class="loading">Creating your ultimate cat masterpiece</div>';
+            
+            let url = 'https://cataas.com/cat';
+            
+            if (tag) {
+                url += `/${tag}`;
+            }
+            
+            if (text) {
+                url += `/says/${encodeURIComponent(text)}`;
+            }
+            
+            const params = new URLSearchParams();
+            params.append('width', size);
+            params.append('height', size);
+            
+            if (filter) {
+                params.append('filter', filter);
+            }
+            
+            params.append('t', Date.now()); // Timestamp for cache busting
+            
+            url += `?${params.toString()}`;
+            
+            const displayUrl = url.replace(/&t=\d+/, ''); // Show URL without timestamp
+            endpointDiv.textContent = displayUrl;
+            
+            resultDiv.innerHTML = `
+                <div class="cat-display">
+                    <img src="${url}" alt="Ultimate cat" onload="this.style.opacity=1" style="opacity:0; transition: opacity 0.5s;">
+                </div>
+                <p><strong>🎨 Complete configuration:</strong></p>
+                <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                    <li>📋 Tag: ${tag || 'none (random)'}</li>
+                    <li>💬 Text: ${text || 'none'}</li>
+                    <li>📏 Size: ${size}x${size}px</li>
+                    <li>🎭 Filter: ${filter || 'none'}</li>
+                </ul>
+                <p style="margin-top: 1.5rem; padding: 1rem; background: #f0f9ff; border-radius: 10px;">
+                    <strong>🎓 You did it!</strong> You've mastered API calls with parameters, tags, and filters. 
+                    You can now use these same principles with any API! Try experimenting with different combinations.
+                </p>
+            `;
+        }
+    </script>
+</body>
+</html>
